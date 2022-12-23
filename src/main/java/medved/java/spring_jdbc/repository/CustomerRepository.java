@@ -1,37 +1,23 @@
 package medved.java.spring_jdbc.repository;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import medved.java.spring_jdbc.entity.OrderInfo;
 import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Repository
 public class CustomerRepository {
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private String query;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    public CustomerRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
-
-    public List<String> getProductName(String name){
-        query = read("queryCustomer.sql");
-        return namedParameterJdbcTemplate.queryForList(query, Map.of("name", name), String.class);
-    }
-
-    private static String read(String scriptFileName){
-        try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))){
-            return bufferedReader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e){
-            throw new RuntimeException(e);
-        }
+    public List<OrderInfo> getProductName(String name) {
+        return entityManager
+//                .createQuery("select o.product_name from Orders as o, Customers as c where c.name = :name")
+//                .createQuery("select o.productName from Order as o inner join Customers as c where c.name=:name")
+                .createQuery("select distinct o.order from Order as o where o.customer.name=:name order by o.order.date")
+                .setParameter("name", name)
+                .getResultList();
     }
 }
