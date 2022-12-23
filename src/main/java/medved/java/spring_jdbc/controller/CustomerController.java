@@ -1,5 +1,7 @@
 package medved.java.spring_jdbc.controller;
 
+import medved.java.spring_jdbc.entity.Order;
+import medved.java.spring_jdbc.entity.OrderInfo;
 import medved.java.spring_jdbc.repository.CustomerRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,7 @@ public class CustomerController {
     }
 
     @GetMapping("/fetch-product")
-    private List<String> getProductName(@RequestParam(value = "name") String clientName){
+    private List<OrderInfo> getProductName(@RequestParam(value = "name") String clientName){
         return customerRepository.getProductName(clientName);
     }
 }
